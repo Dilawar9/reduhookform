@@ -1,0 +1,10 @@
+
+
+body {
+    background-color: #efefef;
+    padding-top: 60px;
+}
+
+.example::-webkit-scrollbar {
+    display: none;
+  }
