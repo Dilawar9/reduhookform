@@ -1,14 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-
-
+import { Button } from 'antd';
 import { asyncLogin } from "../authSlice/authSlice"
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux"
-import { useEffect } from 'react'
-
 
 const loginSchema = yup
   .object({
@@ -17,19 +14,37 @@ const loginSchema = yup
   }).required()
 
 const Login = () => {
-  const { register, handleSubmit, watch, formState: { errors }, } = useForm({
+
+  const { register, handleSubmit, formState: { errors }, } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
   const userInfo = useSelector((state) => state.userAuth);
   const navigator = useNavigate();
   const dispacher = useDispatch();
+  const [loadings, setLoadings] = useState(true);
+
+
+  // loading
+  // const enterLoading = (index) => {
+  //   setLoadings((prevLoadings) => {
+  //     const newLoadings = [...prevLoadings];
+  //     newLoadings[index] = true;
+  //     return newLoadings;
+  //   });
+  //   setTimeout(() => {
+  //     setLoadings((prevLoadings) => {
+  //       const newLoadings = [...prevLoadings];
+  //       newLoadings[index] = false;
+  //       return newLoadings;
+  //     });
+  //   }, 6000);
+  // };
 
 
   const onSubmit = (data) => {
-    console.log(data);
     dispacher(asyncLogin(data))
-  };
+  }
 
   useEffect(() => {
     if (userInfo.isLogin === true) {
@@ -39,10 +54,10 @@ const Login = () => {
 
   return (
     <>
-      <div className="container">
-        <div className="row">
+      <div className="card w-50 mx-auto">
+        <div className="card-header"><h4 className="text-center">Login Form</h4></div>
+        <div className="card-body">
           <div className="col-md-6 offset-md-3">
-            <h2 className="text-center mb-4">Login Form</h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
@@ -57,7 +72,7 @@ const Login = () => {
                 />
               </div>
               {
-                (errors.email) ? <p className='alert alert-danger'>{errors.email?.message}</p> : null
+                (errors.email) ? <p className='alert alert-danger p-1 fs-6'>{errors.email?.message}</p> : null
               }
 
               {/* {errors.email?.type === "maxLength" && (
@@ -77,9 +92,11 @@ const Login = () => {
               {
                 (errors.password) ? <p className='alert alert-danger'>{errors.password?.message}</p> : null
               }
-              <button type="submit" className="btn btn-primary">
+              <Button type="primary" htmlType='submit'
+                // loading={loadings}
+              >
                 Login
-              </button>
+              </Button>
             </form>
           </div>
         </div>

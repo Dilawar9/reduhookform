@@ -1,5 +1,5 @@
-const PostModel=require("../model/PostModel")
-const cloudinary=require("cloudinary");
+const PostModel = require("../model/PostModel")
+const cloudinary = require("cloudinary");
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -14,7 +14,7 @@ cloudinary.v2.config({
 
 
 const createPost = async (req, res) => {
-
+console.log('22222')
 
     try {
         // converting buffer into base64
@@ -25,15 +25,15 @@ const createPost = async (req, res) => {
         console.log("before")
 
         const newPost = await PostModel.create({
-             content: req.body.content, 
-             imageUrl: photoObject.url, 
-             authorId: req.userId 
-            });
+            content: req.body.content,
+            imageUrl: photoObject.url,
+            authorId: req.userId
+        });
 
         return res.status(201).json({
             status: 'success',
             message: "successfully created",
-            newlyPost : newPost
+            newlyPost: newPost
         })
     } catch (error) {
         console.log(error.message);
@@ -42,11 +42,16 @@ const createPost = async (req, res) => {
 
 const myPosts = async (req, res) => {
     try {
-        const posts = await PostModel.find({authorId: req.userId});
+        const posts = await PostModel.find({ authorId: req.userId }).populate({
+            path: "authorId",
+            //select: "name", // Only include 'name' field from User collection
+            //match: { $exists: true }
+        }).sort({ createdAt: -1 })
+        const filteredPosts = posts.filter(p => p.authorId != null);
 
         return res.json({
             status: 'success',
-            posts: posts
+            posts: filteredPosts
         })
     } catch (error) {
         console.log(error.message);
@@ -55,15 +60,21 @@ const myPosts = async (req, res) => {
 
 const getall = async (req, res) => {
     try {
-        const posts = await PostModel.find({});
+        const posts = await PostModel.find().populate({
+            path: "authorId",
+            //select: "name", // Only include 'name' field from User collection
+            //match: { $exists: true }
+          }).sort({createdAt: -1})
 
-        return res.json({
-            status: 'success',
-            posts: posts
-        })
+        const filteredPosts = posts.filter(p => p.authorId != null);
+
+        return res.status(200).json({
+            status: "success",
+            posts: filteredPosts
+        });
     } catch (error) {
         console.log(error.message);
     }
 }
 
-module.exports = { createPost, myPosts,getall }
+module.exports = { createPost, myPosts, getall }

@@ -3,11 +3,6 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 
-import { asyncsignup } from "../authSlice/authSlice"
-import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"
-import { useEffect } from 'react'
-
 
 const signupSchema = yup
   .object({
@@ -17,8 +12,9 @@ const signupSchema = yup
     confirm_password: yup.string()
       .oneOf([yup.ref('password'), null], 'Passwords must match')
       .required('Confirm Password is required'),
-    // image: yup.mixed().required('File is required'),
+    image: yup.mixed().required('File is required'),
   }).required();
+
 
 const Signup = () => {
 
@@ -26,21 +22,11 @@ const Signup = () => {
     resolver: yupResolver(signupSchema),
   });
 
-  const userInfo = useSelector((state) => state.userAuth);
-  const navigator = useNavigate();
-  const dispacher = useDispatch();
-
 
   const onSubmit = (data) => {
     console.log('Signed up!', data);
-    dispacher(asyncsignup(data))
-
-    useEffect(() => {
-      if (userInfo.isLogin === true) {
-        navigator("/signup");
-      }
-    }, [userInfo.isLogin]);
   }
+
   return (
     <>
       <div className="card w-75 mx-auto">
@@ -131,4 +117,4 @@ const Signup = () => {
   )
 }
 
-export default Signup;
+export default Signup

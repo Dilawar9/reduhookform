@@ -3,8 +3,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const checkAuth = (req, res, next) => {
+    console.log(req.headers.authorization)
     try {
+        console.log('3333')
         const token = req.headers.authorization.split(" ")[1];
+        console.log(token)
         // check token is available in headers
         if(!token) {
             return res.json({
@@ -14,7 +17,7 @@ const checkAuth = (req, res, next) => {
         }
 
         // if token available then verify its authentication and extract userId from it
-        const decoded = jwt.verify(token,  process.env.JWT_SECRET_KEY);
+        const decoded =jwt.verify(token,process.env.JWT_SECRET_KEY);
 
         // todo check if user id is availab in db
 
