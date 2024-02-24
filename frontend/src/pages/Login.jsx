@@ -22,7 +22,7 @@ const Login = () => {
   const userInfo = useSelector((state) => state.userAuth);
   const navigator = useNavigate();
   const dispacher = useDispatch();
-  const [loadings, setLoadings] = useState(true);
+  // const [loadings, setLoadings] = useState(true);
 
 
   // loading
