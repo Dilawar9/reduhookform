@@ -6,6 +6,8 @@ import { Button } from 'antd';
 import { asyncLogin } from "../authSlice/authSlice"
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux"
+const accessToken = localStorage.getItem("accessToken");
+
 
 const loginSchema = yup
   .object({
@@ -20,6 +22,7 @@ const Login = () => {
   });
 
   const userInfo = useSelector((state) => state.userAuth);
+
   const navigator = useNavigate();
   const dispacher = useDispatch();
   // const [loadings, setLoadings] = useState(true);
@@ -91,6 +94,10 @@ const Login = () => {
               </div>
               {
                 (errors.password) ? <p className='alert alert-danger'>{errors.password?.message}</p> : null
+              }
+
+              {
+                (userInfo.loginerror !== null )?<p className='alert alert-danger'>{userInfo.loginerror}</p>:null
               }
               <Button type="primary" htmlType='submit'
                 // loading={loadings}

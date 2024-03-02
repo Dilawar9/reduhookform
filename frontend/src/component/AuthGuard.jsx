@@ -7,7 +7,7 @@ const AuthGuard = ({ children }) => {
     let navigate = useNavigate();
     const accessToken = localStorage.getItem("accessToken");
     useEffect(() => {
-        if (accessToken == null || accessToken == undefined) {
+        if (userInfo.isLogin !== true) {
             navigate("/login")
         }
     }, [])
@@ -17,4 +17,4 @@ const AuthGuard = ({ children }) => {
     }
 }
 
-export default AuthGuard
+export default AuthGuard;

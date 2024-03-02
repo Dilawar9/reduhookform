@@ -12,7 +12,7 @@ import httpClient from '../../httpClient';
 import LoadingBar from 'react-top-loading-bar'
 
 
-const SideWidget = ({ image, setPosts, setUpdatePosts }) => {
+const SideWidget = ({ image, setPosts, setUpdatePosts, posts }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const userInfo = useSelector((state) => state.userAuth)
     const loadingRef = useRef(null);
@@ -30,12 +30,12 @@ const SideWidget = ({ image, setPosts, setUpdatePosts }) => {
     const handleMyPosts = () => {
         loadingRef.current.continuousStart();
         // alert(localStorage.getItem("accessToken"));
-            httpClient.get("/post/my").then((res) => {
-                if (res.data.status == 'success') {
-                    setPosts(res.data.posts);
-                }
-            }).catch(err => console.log(err.message))
-            .finally( () => {
+        httpClient.get("/post/my").then((res) => {
+            if (res.data.status == 'success') {
+                setPosts(res.data.posts);
+            }
+        }).catch(err => console.log(err.message))
+            .finally(() => {
                 loadingRef.current.complete();
             })
 
@@ -44,17 +44,17 @@ const SideWidget = ({ image, setPosts, setUpdatePosts }) => {
     return (
 
         <div className=' p-4'>
-            <LoadingBar  ref={loadingRef} />
-            <PostModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} />
+            <LoadingBar ref={loadingRef} />
+            <PostModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} setUpdatePosts={setUpdatePosts} />
             <div className='mx-auto text-center'>
                 <img src={image} className='d-inline sidewidget__photo object-fit-cover' />
             </div>
-            <h3 className='fs-4 text-center mt-4'>{userInfo.name}</h3>
-            <p className='fs-6 text-center w-75 mx-auto'>I am a professional photographer</p>
+            {/* <h3 className='fs-4 text-center mt-4'>{userInfo.name}</h3> */}
+            <p className='fs-6 text-center w-75 mx-auto'>{userInfo.username}</p>
 
             <div className='mt-4 d-flex justify-content-around'>
                 <div className='text-center'>
-                    <h5>123</h5>
+                    <h5>{posts.length}</h5>
                     <p>Posts</p>
                 </div>
                 <div className='text-center'>
@@ -68,7 +68,7 @@ const SideWidget = ({ image, setPosts, setUpdatePosts }) => {
             </div>
 
             <div className='navLinks py-2'>
-                <button onClick={ () => setUpdatePosts(true)} className="btn btn-outline-dark border-0 fs-5 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2 ">
+                <button onClick={() => setUpdatePosts(true)} className="btn btn-outline-dark border-0 fs-5 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2 ">
                     <IoMdHome style={{ fontSize: "24px" }} />
                     <span>Home</span>
                 </button>

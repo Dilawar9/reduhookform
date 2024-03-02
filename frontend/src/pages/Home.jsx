@@ -12,12 +12,11 @@ const Home = () => {
 
   useEffect(() => {
     loadingRef.current.continuousStart();
-
-    httpClient.get('/post/getall').then((response) => {
-      console.log(response.data.status)
+    httpClient.get('/post/getall').then((res) => {
+      // console.log(res.data.status)
      
-      if (response.data.status == "success") {
-        setPosts(response.data.posts);
+      if (res.data.status == "success") {
+        setPosts(res.data.posts);
       }
 
     }).catch(error => console.log(error.message))
@@ -32,15 +31,15 @@ const Home = () => {
     <div className='row'>
       <LoadingBar ref={loadingRef} />
       <div className='col-md-4'>
-        <SideWidget image={image} setPosts={setPosts}  setUpdatePosts={setUpdatePosts} />
+        <SideWidget image={image} setPosts={setPosts}  setUpdatePosts={setUpdatePosts} posts={posts}/>
       </div>
       <div className='col-md-8 example' style={{ height: '100vh', overflowY: 'auto' }}>
         {
-          posts.map(post => <PostCard key={post._id} post={post} />)
+          posts.map(post => <PostCard key={post._id} post={post} setPosts={setPosts}/>)
         }
       </div>
     </div>
   )
 }
 
-export default Home
+export default Home;

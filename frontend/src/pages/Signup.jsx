@@ -1,8 +1,12 @@
 import React from 'react'
+import { useEffect } from 'react'
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-
+import { asyncSingup } from '../authSlice/authSlice';
+import { useSelector, useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom";
+import { Button } from 'antd';
 
 const signupSchema = yup
   .object({
@@ -12,7 +16,7 @@ const signupSchema = yup
     confirm_password: yup.string()
       .oneOf([yup.ref('password'), null], 'Passwords must match')
       .required('Confirm Password is required'),
-    image: yup.mixed().required('File is required'),
+    // image: yup.mixed().required('File is required'),
   }).required();
 
 
@@ -22,10 +26,25 @@ const Signup = () => {
     resolver: yupResolver(signupSchema),
   });
 
+  const userInfo = useSelector((state) => state.userAuth);
+  const navigator = useNavigate();
+  const dispacher = useDispatch();
+
 
   const onSubmit = (data) => {
+
+    dispacher(asyncSingup(data))
+
     console.log('Signed up!', data);
   }
+
+  useEffect(() => {
+    if (userInfo.isLogin === true) {
+      navigator("/");
+    }
+  }, [userInfo.isLogin]);
+
+
 
   return (
     <>
@@ -96,6 +115,9 @@ const Signup = () => {
                 {
                   (errors.confirm_password) ? <p className='alert alert-danger p-1 mt-1 text-sm'>{errors.confirm_password?.message}</p> : null
                 }
+                {
+                  (userInfo.error!== null) ? <p className='alert alert-danger'>{userInfo.error}</p> : null
+                }
               </div>
               {/* <div className="mb-3">
                 <label htmlFor="inputImage" className="form-label">
@@ -106,9 +128,12 @@ const Signup = () => {
                   (errors.image) ? <p className='alert alert-danger p-1 mt-1 text-sm'>{errors.image?.message}</p> : null
                 }
               </div> */}
-              <button type="submit" className="btn btn-primary">
-                Create Account
-              </button>
+              <Button type="primary" htmlType='submit'
+              // loading={loadings}
+              >
+                Signup
+              </Button>
+
             </form>
           </div>
         </div>
@@ -117,4 +142,4 @@ const Signup = () => {
   )
 }
 
-export default Signup
+export default Signup;

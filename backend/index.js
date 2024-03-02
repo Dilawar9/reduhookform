@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const dotenv = require('dotenv');
 const userRouter = require("./route/UserRoute");
 const postRouter=require("./route/PostRoute")
+const commentRouter=require("./route/CommentRoute")
 // Load environment variables from a .env file
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.use("/user", userRouter);
 app.use("/post", postRouter);
+app.use("/comment", commentRouter);
 
 
 

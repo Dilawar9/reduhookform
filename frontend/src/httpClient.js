@@ -4,8 +4,24 @@ import axios from "axios";
 const httpClient = axios.create({
     baseURL: import.meta.env.VITE_API_SERVER_URL,
     timeout: 5000,
-    headers: {'Authorization': 'Bearer '+localStorage.getItem("accessToken")}
   });
+
+  httpClient.interceptors.request.use(
+    (config) => {
+      // Get the token from local storage or wherever it is stored
+      const token = localStorage.getItem('accessToken');
+      
+      // If a token exists, add it to the request headers
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
 
   // Add a response interceptor

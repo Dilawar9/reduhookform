@@ -6,6 +6,7 @@ import { useSelector } from "react-redux"
 
 const Navbar = () => {
     const userInfo = useSelector((state) => state.userAuth);
+    // const accessToken = localStorage.getItem("accessToken");
 
 
     return (
@@ -29,16 +30,29 @@ const Navbar = () => {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                             {
-                                (userInfo.isLogin !== true) ? <li className="nav-item">
-                                    <Link className="nav-link" to="/login">
-                                        Login
-                                    </Link>
-                                </li> : <li className="nav-item">
+                                (userInfo.isLogin == true) ? <li className="nav-item">
                                     <Link className="nav-link" to="/logout">
                                         Logout
                                     </Link>
-                                </li>
+                                </li> : (<>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/login">
+                                            Login
+                                        </Link>
+                                    </li><li className="nav-item">
+                                        <Link className="nav-link" to="/signup">
+                                            Signup
+                                        </Link>
+                                    </li>
+                                </>)
+
+
                             }
+                            <li className="nav-item">
+                                <Link className="nav-link" to="/">
+                                    Home
+                                </Link>
+                            </li>
 
                         </ul>
                         <form className="d-flex" role="search">
