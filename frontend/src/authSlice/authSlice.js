@@ -35,7 +35,9 @@ export const authSlice = createSlice({
     name: 'authSlice',
     initialState: {
         loading: false,
-        userInfo: null,
+        userInfo: {
+            photo:null
+        },
         userToken: null,
         error: null,
         isLogin: false,
@@ -54,6 +56,7 @@ export const authSlice = createSlice({
         updateuser: (state, action) => {
             console.log(action.payload,"2331")
             state.username = action.payload.name;
+            state.userInfo=action.payload.photo;
         }
 
 
@@ -71,6 +74,7 @@ export const authSlice = createSlice({
                 state.userToken = action.payload.token;
                 localStorage.setItem("accessToken", action.payload.token)
                 localStorage.setItem("userinfo", JSON.stringify(action.payload.user))
+                state.userInfo=action.payload.user?.photo;
                 state.isLogin = true;
                 state.username = action.payload.user.name;
             }

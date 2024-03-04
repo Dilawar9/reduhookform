@@ -5,15 +5,16 @@ import { PiChatCircleText } from "react-icons/pi";
 import { PiShareFatFill } from "react-icons/pi";
 import TimeAgo from 'react-timeago'
 import { Link } from 'react-router-dom';
-import  Comment from '../commentmodel/Comment';
-import { useState ,useRef} from 'react';
+import Comment from '../commentmodel/Comment';
+import { useState, useRef } from 'react';
 import httpClient from '../../httpClient';
 import LoadingBar from 'react-top-loading-bar'
-const PostCard = ({ post }) => {
+import { useSelector } from "react-redux"
+const PostCard = ({ post ,setUpdatePosts,image}) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [comment,setComment]=useState("");
     const loadingRef = useRef(null);
+    const userInfo = useSelector((state) => state.userAuth)
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -25,27 +26,15 @@ const PostCard = ({ post }) => {
         setIsModalOpen(false);
     };
 
-    const handle = () => {
-        showModal();
-        loadingRef.current.continuousStart();
-        // alert(localStorage.getItem("accessToken"));
-        httpClient.post("/comment/create").then((res) => {
-            if (res.data.status == 'success') {
-                setComment(res.data.posts);
-            }
-        }).catch(err => console.log(err.message))
-            .finally(() => {
-                loadingRef.current.complete();
-            })
 
-    }
     return (
-        
+
         <div className='postCard_ mt-4 pt-3 p-4'>
-             <LoadingBar ref={loadingRef} />
-            <Comment isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} commetn={comment} />
+            <LoadingBar ref={loadingRef} />
+            <Comment isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} setUpdatePosts={setUpdatePosts} post={post} />
             <div className='d-flex gap-3 mb-3'>
-                <div><img src="https://picsum.photos/200" className='d-inline profile__photo-small object-fit-cover' /></div>
+                <div>{
+                    (userInfo.userInfo ==null? <img src={image} className='d-inline profile__photo-small object-fit-cover' />:<img src={post.authorId.photo} className='d-inline profile__photo-small object-fit-cover' />)}</div>
                 <div className=''>
                     <h6>{post.authorId.name} - <TimeAgo date={post.createdAt} /> </h6>
                     <p>{post.content}</p>
@@ -56,17 +45,28 @@ const PostCard = ({ post }) => {
             </div>
             <div className='postCard__icons d-flex align-items-center gap-3 mt-2'>
                 <span><CiHeart style={{ fontSize: "20px" }} /></span>
-                {/* <Link to="/comment">
-                    <span><PiChatCircleText style={{ fontSize: "20px" }} /></span>
-                </Link> */}
-                <button onClick={handle}  className="btn btn-outline-danger fs-5 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2">
+
+                <span onClick={showModal} ><PiChatCircleText style={{ fontSize: "20px" }} /></span>
+
+                {/* <button onClick={handle}  className="btn btn-outline-danger fs-5 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2">
                     <PiChatCircleText style={{ fontSize: "20px" }} />
-            </button>
-            
-            <span><PiShareFatFill style={{ fontSize: "20px" }} /></span>
-        </div>
-    </div >
-  )
+            </button> */}
+
+                <span><PiShareFatFill style={{ fontSize: "20px" }} /></span>
+            </div>
+            <div className='mt-3'>
+                {
+                    post.comments.map((e,id)=>{
+                      return <div className='d-flex justify-content-between' key={id}>
+                        <div>{e.comment}</div>
+                        <div><TimeAgo date={e.createdAt}/></div>
+
+                       </div>
+                    })
+                }
+            </div>
+        </div >
+    )
 }
 
 export default PostCard;

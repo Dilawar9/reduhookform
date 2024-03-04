@@ -35,7 +35,7 @@ const Home = () => {
       </div>
       <div className='col-md-8 example' style={{ height: '100vh', overflowY: 'auto' }}>
         {
-          posts.map(post => <PostCard key={post._id} post={post} setPosts={setPosts}/>)
+          posts.map(post => <PostCard key={post._id} post={post} setUpdatePosts={setUpdatePosts} setPosts={setPosts} image={image}/>)
         }
       </div>
     </div>

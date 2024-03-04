@@ -1,8 +1,18 @@
 const User = require("../model/UserModel");
 const bcrypt = require('bcrypt');
 const {generateToken} = require("../helper/utils");
+const cloudinary = require("cloudinary");
+
+const dotenv = require('dotenv');
+dotenv.config();
 
 
+
+cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 const signup = async (req, res) => {
     try {
         let { name, email, password } = req.body;
@@ -59,5 +69,52 @@ const login = async (req, res) => {
     }
 }
 
+// update profile
 
-module.exports = { signup, login }
+const updateuser = async (req, res) => {
+    console.log('22222')
+    
+        try {
+            // converting buffer into base64
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const photoObject = await cloudinary.v2.uploader.upload(dataURI);
+            // create post
+            
+          
+    
+            const user= await User.findByIdAndUpdate(req.userId,{name:req.body.name,email:req.body.email,photo:photoObject.url},{new:true});
+         
+    
+            return res.status(201).json({
+                status: 'success',
+                message: "successfully created",
+                user: user
+            })
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+
+    // get user
+    const getuser = async (req, res) => {
+        try {
+             
+            const user =  await User.findById(req.userId)
+            return res.status(200).json({
+                status: 'success',
+                token: generateToken(user) ,
+                user:user
+            })
+    
+    
+        } catch (error) {
+            console.log(`Error in SignUp ${error}`);
+            res.status(500).json({ status: 'Failed', message: error.message });
+        }
+    }
+
+
+
+module.exports = { signup, login,updateuser,getuser }

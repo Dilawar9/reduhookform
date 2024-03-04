@@ -1,4 +1,5 @@
 const CommentModel = require("../model/CommentModel")
+const PostModel=require("../model/PostModel")
 
 
 
@@ -14,14 +15,18 @@ const createcomment = async (req, res) => {
 
         const newcomment = await CommentModel.create({
             comment: req.body.comment,
-            commentby: req.userId,
-            postId: req.postId
+            postId: req.body.postId
         });
 
+        await PostModel.findOneAndUpdate(
+            {_id:req.body.postId},
+            {$push:{comments:newcomment._id}}
+        )
+        
         return res.status(201).json({
             status: 'success',
             message: "successfully created",
-            newcomment: newcomment
+          
         })
     } catch (error) {
         console.log(error.message);
@@ -48,36 +53,36 @@ const mycomment = async (req, res) => {
     }
 }
 
-// const getall = async (req, res) => {
-//     console.log(req.body)
-//     try {
-
-//         const comment = await CommentModel.find();
-//         return res.status(200).json({
-//             status: "success",
-//             comment: comment
-//         });
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
-
 const getall = async (req, res) => {
+    console.log(req.body)
     try {
-        const comment = await CommentModel.find().populate({
-            path: "commentby",
-            //select: "name", // Only include 'name' field from User collection
-            //match: { $exists: true }
-          }).sort({createdAt: -1})
 
-        const filteredcomment = comment.filter(p => p.commentby != null);
-
+        const comment = await CommentModel.find();
         return res.status(200).json({
             status: "success",
-            comment: filteredcomment
+            comment: comment
         });
     } catch (error) {
         console.log(error.message);
     }
 }
+
+// const getall = async (req, res) => {
+//     try {
+//         const comment = await CommentModel.find().populate({
+//             path: "commentby",
+//             //select: "name", // Only include 'name' field from User collection
+//             //match: { $exists: true }
+//           }).sort({createdAt: -1})
+
+//         const filteredcomment = comment.filter(p => p.commentby != null);
+
+//         return res.status(200).json({
+//             status: "success",
+//             comment: filteredcomment
+//         });
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// }
 module.exports = { createcomment, mycomment, getall }

@@ -12,7 +12,7 @@ const postSchema = yup
         comment: yup.string().required(),            
     }).required()
 
-const Comment = ({ isModalOpen, handleOk, handleCancel ,setUpdatePosts}) => {
+const Comment = ({ isModalOpen, handleOk, handleCancel ,setUpdatePosts,post}) => {
     const [isLoading, setIsLoading] = useState(false);
     // Modal Code
     const { register, handleSubmit, formState: { errors }, } = useForm({
@@ -24,7 +24,7 @@ const Comment = ({ isModalOpen, handleOk, handleCancel ,setUpdatePosts}) => {
         setIsLoading(true)
         httpClient.post("/comment/create", {
             comment: data.comment,
-
+            postId:post._id
         }).then((res) => {
             console.log(res)
             handleCancel();

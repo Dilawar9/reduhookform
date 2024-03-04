@@ -10,18 +10,37 @@ import PostModal from '../PostModal/PostModal';
 import { useSelector } from "react-redux"
 import httpClient from '../../httpClient';
 import LoadingBar from 'react-top-loading-bar'
+import Userupdate from '../userupdate/Userupdate';
+import ProfileModal from '../PostModal/ProfileModal';
 
 
 const SideWidget = ({ image, setPosts, setUpdatePosts, posts }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const userInfo = useSelector((state) => state.userAuth)
-    const loadingRef = useRef(null);
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const  [isUpdatingProfile, setIsUpdatingProfile ]=useState(false)
+
+    const userInfo = useSelector((state) => state.userAuth)
+
+    const loadingRef = useRef(null);
+//   profile update
+    const profilemodal=()=>{
+        setIsUpdatingProfile(true)
+    }
+
+    const profileCancele = () => {
+        setIsUpdatingProfile(false)
+    };
+
+    const profilehandle = (data) => {
+      console(data)
+    };
+
+    // post modal 
     const showModal = () => {
         setIsModalOpen(true);
     };
-    const handleOk = () => {
-        setIsModalOpen(false);
+    const handleOk = (data) => {
+       console.log(data)
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -45,9 +64,14 @@ const SideWidget = ({ image, setPosts, setUpdatePosts, posts }) => {
 
         <div className=' p-4'>
             <LoadingBar ref={loadingRef} />
+
             <PostModal isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} setUpdatePosts={setUpdatePosts} />
+
+            <ProfileModal isModalOpen={isUpdatingProfile} handleOk={profilehandle} handleCancel={profileCancele} />
             <div className='mx-auto text-center'>
-                <img src={image} className='d-inline sidewidget__photo object-fit-cover' />
+               {
+                (userInfo.userInfo ==null?<img src={image} className='d-inline sidewidget__photo object-fit-cover' />:<img src={userInfo.userInfo} className='d-inline sidewidget__photo object-fit-cover' />)
+               } 
             </div>
             {/* <h3 className='fs-4 text-center mt-4'>{userInfo.name}</h3> */}
             <p className='fs-6 text-center w-75 mx-auto'>{userInfo.username}</p>
@@ -76,7 +100,7 @@ const SideWidget = ({ image, setPosts, setUpdatePosts, posts }) => {
                     <BsFillSignpostSplitFill style={{ fontSize: "24px" }} />
                     <span>My Posts</span>
                 </Link>
-                <Link to='/' className="btn btn-outline-dark fs-5  border-0 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2">
+                <Link to='/' onClick={profilemodal} className="btn btn-outline-dark fs-5  border-0 px-3 py-2 align-items-center gap-2 text-start d-flex mb-2">
                     <RiUserSettingsFill style={{ fontSize: "24px" }} />
                     <span>Edit Profile</span>
                 </Link>
