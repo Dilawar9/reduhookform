@@ -23,10 +23,10 @@ const Comment = ({ isModalOpen, handleOk, handleCancel ,setUpdatePosts,post}) =>
     const onSubmit = (data) => {
         setIsLoading(true)
         httpClient.post("/comment/create", {
-            comment: data.comment,
             postId:post._id
         }).then((res) => {
             console.log(res)
+            setComment(res.data.Comment)
             handleCancel();
             setUpdatePosts(true);
         }).catch(err => console.log(err.message))
@@ -40,7 +40,7 @@ const Comment = ({ isModalOpen, handleOk, handleCancel ,setUpdatePosts,post}) =>
                 <h3>Create Comment</h3>
                 <input type='text' className='form-control mb-3' {...register('comment')} />
                 {
-                    (errors.content) ? <p className='alert alert-danger p-1 fs-6'>{errors.content?.message}</p> : null
+                    (errors.comment) ? <p className='alert alert-danger p-1 fs-6'>{errors.comment?.message}</p> : null
                 }
                 {/* <button className='btn btn-outline-warning btn-sm' type='submit'>Create</button> */}
                 <LoaderBtn btnTitle="Create Post" btnType="btn-outline-warning" loading={isLoading} type="submit" />

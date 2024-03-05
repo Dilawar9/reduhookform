@@ -67,22 +67,5 @@ const getall = async (req, res) => {
     }
 }
 
-// const getall = async (req, res) => {
-//     try {
-//         const comment = await CommentModel.find().populate({
-//             path: "commentby",
-//             //select: "name", // Only include 'name' field from User collection
-//             //match: { $exists: true }
-//           }).sort({createdAt: -1})
 
-//         const filteredcomment = comment.filter(p => p.commentby != null);
-
-//         return res.status(200).json({
-//             status: "success",
-//             comment: filteredcomment
-//         });
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
 module.exports = { createcomment, mycomment, getall }

@@ -1,7 +1,11 @@
+const mongoose=require('mongoose')
 const PostModel = require("../model/PostModel")
+const LikeModel = require("../model/LikeModel")
+
 const cloudinary = require("cloudinary");
 
 const dotenv = require('dotenv');
+
 dotenv.config();
 
 // setup cloudinary
@@ -14,7 +18,7 @@ cloudinary.v2.config({
 
 
 const createPost = async (req, res) => {
-console.log('22222')
+    console.log('22222')
 
     try {
         // converting buffer into base64
@@ -42,7 +46,7 @@ console.log('22222')
 
 const myPosts = async (req, res) => {
     try {
-        const posts = await PostModel.find({ authorId: req.userId }).populate([ "authorId", "comments"]).sort({ createdAt: -1 })
+        const posts = await PostModel.find({ authorId: req.userId }).populate(["authorId", "comments"]).sort({ createdAt: -1 })
         const filteredPosts = posts.filter(p => p.authorId != null);
 
         return res.json({
@@ -56,10 +60,41 @@ const myPosts = async (req, res) => {
 
 const getall = async (req, res) => {
     try {
-        const posts = await PostModel.find({}).populate([ "authorId", "comments"]).sort({createdAt: -1})
-        console.log(posts)
+        const posts = await PostModel.find({}).populate(["authorId", "comments"]).sort({ createdAt: -1 })
        
-        const filteredPosts = posts.filter(p => p.authorId != null);
+
+        // const filteredPosts = posts.filter(p => p.authorId != null);
+        const userId=req.userId;
+
+        const filteredPosts=[];
+
+        await Promise.all(posts.map(async(post) => {
+            
+            if(post.authorId !=null ) {
+              
+               const PostObjectId = new mongoose.Types.ObjectId(post._id).toString();
+                const userObjectId = new mongoose.Types.ObjectId(post.authorId._id).toString();
+                
+               
+                let findlike=await LikeModel.findOne({userId:userObjectId,postId:PostObjectId}); 
+                let totoallikespostid=await LikeModel.countDocuments({postId:PostObjectId})
+
+                let isliked=false;
+
+                if(findlike){
+                    isliked=true;
+
+                }
+                 let newpost={
+                    ...post.toObject(),
+                    isliked:isliked,
+                    totalikes:totoallikespostid
+                 }
+
+                 filteredPosts.push(newpost)
+
+            }
+        }))
 
         return res.status(200).json({
             status: "success",
@@ -70,4 +105,51 @@ const getall = async (req, res) => {
     }
 }
 
-module.exports = { createPost, myPosts, getall }
+// like post
+
+const like = async (req, res) => {
+
+   
+
+    try {
+        postId = req.body.postId;
+        userId = req.userId;
+        const postexist = await PostModel.findById(postId);
+
+        if (!postexist) {
+
+            return res.status(201).json({
+                status: "success",
+                message: "post not found"
+            });
+        }
+
+        const like = await LikeModel.findOne({ userId: userId, postId: postId })
+       
+
+        if (!like) {
+            const newlike = await LikeModel.create({
+                userId: userId,
+                postId: postId,
+                like: 1
+            })
+            return res.status(201).json({
+                status: "success",
+                isLike: true
+            });
+
+        } else if (like) {
+            await like.deleteOne();
+            return res.status(201).json({
+                status: "faild",
+                isLike: false
+            });
+        }
+       
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+module.exports = { createPost, myPosts, getall, like }

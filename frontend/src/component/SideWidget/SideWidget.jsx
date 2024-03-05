@@ -10,7 +10,6 @@ import PostModal from '../PostModal/PostModal';
 import { useSelector } from "react-redux"
 import httpClient from '../../httpClient';
 import LoadingBar from 'react-top-loading-bar'
-import Userupdate from '../userupdate/Userupdate';
 import ProfileModal from '../PostModal/ProfileModal';
 
 

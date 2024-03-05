@@ -6,16 +6,9 @@ const likeschema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    userid: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to the User model
-        required: true
-    },
-    postId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post', // Reference to the Post model
-        required: true
-    }
+    // 
+    userId:{type:String},
+    postId:{type:String}
 }, { timestamps: true });
 
 // Create comment model
