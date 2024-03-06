@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import "./PostCard.css";
 import { CiHeart } from "react-icons/ci";
+import { FaHeart } from "react-icons/fa";
 import { PiChatCircleText } from "react-icons/pi";
 import { PiShareFatFill } from "react-icons/pi";
 import TimeAgo from 'react-timeago'
@@ -13,7 +14,10 @@ import { useSelector } from "react-redux"
 const PostCard = ({ post, setUpdatePosts, image }) => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const loadingRef = useRef(null);
+
+    const [totalLikes, setTotalLikes] = useState(0);
+    const [isLikedIcon, setIsLikedIcon] = useState(true);
+  
     const userInfo = useSelector((state) => state.userAuth)
 
     const showModal = () => {
@@ -27,10 +31,37 @@ const PostCard = ({ post, setUpdatePosts, image }) => {
     };
 
 
+    const handlelikeclick = async (postId, userId) => {
+        try {
+            const respons = await httpClient.post('/post/like', { postId: postId, userId: userId });
+            console.log(respons)
+            if (respons.data.isLike == true) {
+                setIsLikedIcon(true);
+                setTotalLikes(respons.data.totalikes)
+
+            } else if (respons.data.isLike == false) {
+                setIsLikedIcon(false)
+
+                setTotalLikes(respons.data.totalikes)
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+
+    }
+
+    useEffect(()=>{
+        if(post.isliked==true){
+            setIsLikedIcon(true)
+        }else{
+            setIsLikedIcon(false)
+        }
+        setTotalLikes(post.totalikes)
+    },[])
     return (
 
         <div className='postCard_ mt-4 pt-3 p-4'>
-            <LoadingBar ref={loadingRef} />
+           
             <Comment isModalOpen={isModalOpen} handleOk={handleOk} handleCancel={handleCancel} setUpdatePosts={setUpdatePosts} post={post} />
             <div className='d-flex gap-3 mb-3'>
                 <div>{
@@ -44,11 +75,18 @@ const PostCard = ({ post, setUpdatePosts, image }) => {
                 <img className='img-fluid' src={post.imageUrl} />
             </div>
             <div className='mt-2'>
-                <span>Like:</span>
+                <span>Like:{totalLikes}</span>
             </div>
             <div className='postCard__icons d-flex align-items-center justify-content-between gap-3 mt-2'>
                 <div className="">
-                    <span><CiHeart style={{ fontSize: "20px" }} /></span>
+                    <span onClick={() => { handlelikeclick(post._id, post.authorId._id) }} >
+                    
+                    {
+                        (isLikedIcon)?<FaHeart style={{ color: "red" }}/>:<CiHeart style={{ fontSize: "20px" }} />
+                    }
+                    </span>
+
+
                     <span onClick={showModal} ><PiChatCircleText style={{ fontSize: "20px" }} /></span>
                     <span><PiShareFatFill style={{ fontSize: "20px" }} /></span>
                 </div>
@@ -63,7 +101,6 @@ const PostCard = ({ post, setUpdatePosts, image }) => {
                         return <div className='d-flex justify-content-between' key={id}>
                             <div>{e.comment}</div>
                             <div><TimeAgo date={e.createdAt} /></div>
-
                         </div>
                     })
                 }

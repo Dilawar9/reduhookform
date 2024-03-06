@@ -5,7 +5,7 @@ dotenv.config();
 const checkAuth = (req, res, next) => {
     console.log(req.headers.authorization)
     try {
-        console.log('3333')
+        
         const token = req.headers.authorization.split(" ")[1];
         console.log(token)
         // check token is available in headers

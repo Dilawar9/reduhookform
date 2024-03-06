@@ -1,4 +1,4 @@
-const mongoose=require('mongoose')
+const mongoose = require('mongoose')
 const PostModel = require("../model/PostModel")
 const LikeModel = require("../model/LikeModel")
 
@@ -18,7 +18,7 @@ cloudinary.v2.config({
 
 
 const createPost = async (req, res) => {
-    console.log('22222')
+   
 
     try {
         // converting buffer into base64
@@ -47,8 +47,37 @@ const createPost = async (req, res) => {
 const myPosts = async (req, res) => {
     try {
         const posts = await PostModel.find({ authorId: req.userId }).populate(["authorId", "comments"]).sort({ createdAt: -1 })
-        const filteredPosts = posts.filter(p => p.authorId != null);
+        // const filteredPosts = posts.filter(p => p.authorId != null);
 
+        const filteredPosts = [];
+
+        await Promise.all(posts.map(async (post) => {
+
+            if (post.authorId != null) {
+
+                const PostObjectId = new mongoose.Types.ObjectId(post._id).toString();
+                const userObjectId = new mongoose.Types.ObjectId(req.userId).toString();
+
+
+                let findlike = await LikeModel.findOne({ userId: userObjectId, postId: PostObjectId });
+                let totoallikespostid = await LikeModel.countDocuments({ postId: PostObjectId })
+
+                let isliked = false;
+
+                if (findlike) {
+                    isliked = true;
+
+                }
+                let newpost = {
+                    ...post.toObject(),
+                    isliked: isliked,
+                    totalikes: totoallikespostid
+                }
+
+                filteredPosts.push(newpost)
+
+            }
+        }))
         return res.json({
             status: 'success',
             posts: filteredPosts
@@ -61,37 +90,37 @@ const myPosts = async (req, res) => {
 const getall = async (req, res) => {
     try {
         const posts = await PostModel.find({}).populate(["authorId", "comments"]).sort({ createdAt: -1 })
-       
+
 
         // const filteredPosts = posts.filter(p => p.authorId != null);
-        const userId=req.userId;
+        const userId = req.userId;
 
-        const filteredPosts=[];
+        const filteredPosts = [];
 
-        await Promise.all(posts.map(async(post) => {
-            
-            if(post.authorId !=null ) {
-              
-               const PostObjectId = new mongoose.Types.ObjectId(post._id).toString();
-                const userObjectId = new mongoose.Types.ObjectId(post.authorId._id).toString();
-                
-               
-                let findlike=await LikeModel.findOne({userId:userObjectId,postId:PostObjectId}); 
-                let totoallikespostid=await LikeModel.countDocuments({postId:PostObjectId})
+        await Promise.all(posts.map(async (post) => {
 
-                let isliked=false;
+            if (post.authorId != null) {
 
-                if(findlike){
-                    isliked=true;
+                const PostObjectId = new mongoose.Types.ObjectId(post._id).toString();
+                const userObjectId = new mongoose.Types.ObjectId(req.userId).toString();
+
+
+                let findlike = await LikeModel.findOne({ userId: userObjectId, postId: PostObjectId });
+                let totoallikespostid = await LikeModel.countDocuments({ postId: PostObjectId })
+
+                let isliked = false;
+
+                if (findlike) {
+                    isliked = true;
 
                 }
-                 let newpost={
+                let newpost = {
                     ...post.toObject(),
-                    isliked:isliked,
-                    totalikes:totoallikespostid
-                 }
+                    isliked: isliked,
+                    totalikes: totoallikespostid
+                }
 
-                 filteredPosts.push(newpost)
+                filteredPosts.push(newpost)
 
             }
         }))
@@ -109,7 +138,7 @@ const getall = async (req, res) => {
 
 const like = async (req, res) => {
 
-   
+
 
     try {
         postId = req.body.postId;
@@ -125,7 +154,7 @@ const like = async (req, res) => {
         }
 
         const like = await LikeModel.findOne({ userId: userId, postId: postId })
-       
+
 
         if (!like) {
             const newlike = await LikeModel.create({
@@ -133,19 +162,23 @@ const like = async (req, res) => {
                 postId: postId,
                 like: 1
             })
+            let totoallikespostid = await LikeModel.countDocuments({ postId: postId })
             return res.status(201).json({
                 status: "success",
-                isLike: true
+                isLike: true,
+                totalikes: totoallikespostid
             });
 
         } else if (like) {
             await like.deleteOne();
+            let totoallikespostid = await LikeModel.countDocuments({ postId: postId })
             return res.status(201).json({
-                status: "faild",
-                isLike: false
+                status: "success",
+                isLike: false,
+                totalikes: totoallikespostid
             });
         }
-       
+
 
     } catch (error) {
         console.log(error.message);

@@ -8,7 +8,7 @@ const PostModel=require("../model/PostModel")
 
 
 const createcomment = async (req, res) => {
-    console.log('22222')
+  
     console.log(req.body);
 
     try {
