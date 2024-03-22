@@ -26,7 +26,7 @@ const createPost = async (req, res) => {
         let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
         const photoObject = await cloudinary.v2.uploader.upload(dataURI);
         // create post
-        console.log("before")
+        // console.log("before")
 
         const newPost = await PostModel.create({
             content: req.body.content,

@@ -6,7 +6,7 @@ import { Button } from 'antd';
 import { asyncLogin } from "../authSlice/authSlice"
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux"
-const accessToken = localStorage.getItem("accessToken");
+// const accessToken = localStorage.getItem("accessToken");
 
 
 const loginSchema = yup

@@ -8,6 +8,6 @@ const upload = multer({ storage: storage });
 
 router.post("/signup", UserCtrl.signup);
 router.post("/login", UserCtrl.login);
-router.put("/update",[checkauth, upload.single('photo')],UserCtrl.updateuser);
-router.get("/get",checkauth, UserCtrl.getuser);
+router.put("/update",[checkAuth, upload.single('photo')],UserCtrl.updateuser);
+router.get("/get",checkAuth, UserCtrl.getuser);
 module.exports = router;
